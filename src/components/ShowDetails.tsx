@@ -1,10 +1,13 @@
-
 import { useState } from "react";
-import { Calendar, MapPin, Clock, ArrowLeft, Ticket } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowLeft, Ticket, Youtube, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Ticket types data
 const ticketTypes = [
@@ -113,7 +116,7 @@ const seatingSections: SeatSection[] = [
   }
 ];
 
-// Mock tour data for reference
+// Mock tour data with additional fields
 const allShows = [
   {
     id: 1,
@@ -127,7 +130,14 @@ const allShows = [
     isTour: true,
     description: "A night of laughter with Alex Miller's signature observational comedy. Join Alex as he dissects the absurdities of everyday life, from dating apps to the self-checkout lane. This show features material from his critically acclaimed special 'Ordinary Extraordinary' plus new, never-before-seen bits developed exclusively for this tour.",
     venuePolicies: "21+ only. Two drink minimum. No recording devices allowed.",
-    duration: "90 minutes"
+    duration: "90 minutes",
+    imageUrl: "https://images.unsplash.com/photo-1611215891232-85b67acea065?q=80&w=800",
+    youtubeId: "dQw4w9WgXcQ", // Example YouTube ID
+    galleryImages: [
+      "https://images.unsplash.com/photo-1579532536935-619928decd08?q=80&w=500",
+      "https://images.unsplash.com/photo-1508252592163-5d3c3c559109?q=80&w=500",
+      "https://images.unsplash.com/photo-1553659971-f01207815844?q=80&w=500"
+    ]
   },
   {
     id: 2,
@@ -141,7 +151,13 @@ const allShows = [
     isTour: true,
     description: "Don't miss the Boston leg of Alex's 'Everyday Extraordinary' tour. Following his sold-out show last year, Alex returns to the Wilbur with fresh material and his trademark observational wit. This performance features a special Q&A segment at the end, where Alex will take questions from the audience.",
     venuePolicies: "All ages show. No phones allowed during performance.",
-    duration: "100 minutes"
+    duration: "100 minutes",
+    imageUrl: "https://images.unsplash.com/photo-1525013066836-c6090f0ad9d8?q=80&w=800",
+    youtubeId: null, // No YouTube video yet
+    galleryImages: [
+      "https://images.unsplash.com/photo-1565608438257-fac3c27aa6e6?q=80&w=500",
+      "https://images.unsplash.com/photo-1560889041-3a9d3009d3e0?q=80&w=500"
+    ]
   },
   {
     id: 3,
@@ -155,7 +171,14 @@ const allShows = [
     isTour: true,
     description: "Alex brings his unique perspective on everyday life to the Windy City. This special Chicago performance includes city-specific material and observations from Alex's time living in the Midwest. Expect a mix of polished material and fresh improvisation in this intimate venue.",
     venuePolicies: "18+ only. Two item minimum purchase required.",
-    duration: "75 minutes"
+    duration: "75 minutes",
+    imageUrl: "https://images.unsplash.com/photo-1603739409582-8d21acc0379c?q=80&w=800",
+    youtubeId: "G1IbRujko-A", // Example YouTube ID
+    galleryImages: [
+      "https://images.unsplash.com/photo-1508188609340-d106773001b7?q=80&w=500",
+      "https://images.unsplash.com/photo-1527224538127-2104bb71c51b?q=80&w=500",
+      "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?q=80&w=500"
+    ]
   },
   {
     id: 4,
@@ -169,7 +192,13 @@ const allShows = [
     isTour: true,
     description: "Alex's first time in Austin - expect special Texas-themed material. After years of requests, Alex finally brings his comedy to the Live Music Capital of the World. This show will feature his observations on Southern culture, Texas quirks, and the differences between West Coast and Southern living.",
     venuePolicies: "18+ only. No recording devices. Arrive 30 minutes before showtime.",
-    duration: "90 minutes"
+    duration: "90 minutes",
+    imageUrl: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=800",
+    youtubeId: null,
+    galleryImages: [
+      "https://images.unsplash.com/photo-1597878800896-614e258d23cb?q=80&w=500",
+      "https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?q=80&w=500"
+    ]
   },
   {
     id: 5,
@@ -183,7 +212,14 @@ const allShows = [
     isTour: true,
     description: "Back to where it all began - a special homecoming show at The Comedy Store. Alex returns to the stage where he got his start, delivering an emotional and hilarious evening of comedy. This show will feature surprise guest appearances from comedy legends and friends who influenced Alex's career.",
     venuePolicies: "21+ only. Two drink minimum. No heckling policy strictly enforced.",
-    duration: "120 minutes"
+    duration: "120 minutes",
+    imageUrl: "https://images.unsplash.com/photo-1611348586840-ea9872d33411?q=80&w=800",
+    youtubeId: "zvGBHy-o_uw", // Example YouTube ID
+    galleryImages: [
+      "https://images.unsplash.com/photo-1508252592163-5d3c3c559109?q=80&w=500",
+      "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=500",
+      "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?q=80&w=500"
+    ]
   },
   {
     id: 6,
@@ -197,7 +233,13 @@ const allShows = [
     isTour: true,
     description: "Alex's Pacific Northwest debut with all-new material. This theater show showcases Alex's evolution as a comedian, featuring longer-form stories and more personal material than his club sets. The Paramount's historic venue provides the perfect backdrop for this special performance.",
     venuePolicies: "All ages welcome. Concessions available in lobby.",
-    duration: "100 minutes"
+    duration: "100 minutes",
+    imageUrl: "https://images.unsplash.com/photo-1512592877846-938bd2c3b018?q=80&w=800",
+    youtubeId: null,
+    galleryImages: [
+      "https://images.unsplash.com/photo-1578944032637-f09897c5233d?q=80&w=500",
+      "https://images.unsplash.com/photo-1558507652-2d9626c4e67a?q=80&w=500"
+    ]
   }
 ];
 
@@ -206,6 +248,7 @@ const ShowDetails = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("details");
   
   // Find the show based on the ID from URL params
   const show = allShows.find(s => s.id === parseInt(id || "0"));
@@ -241,40 +284,139 @@ const ShowDetails = () => {
         Back to All Shows
       </Button>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          <div>
-            <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium uppercase tracking-wide mb-4">
-              {show.isTour ? "Tour Date" : "Special Show"}
-            </span>
-            <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-              {show.city}
-            </h1>
-            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
-              <div className="flex items-center">
-                <Calendar size={16} className="mr-1" />
-                {show.date}
-              </div>
-              <div className="flex items-center">
-                <Clock size={16} className="mr-1" />
-                {show.time} ({show.duration})
-              </div>
-              <div className="flex items-center">
-                <MapPin size={16} className="mr-1" />
-                {show.venue}
-              </div>
+      {/* Hero Image */}
+      <div className="w-full h-64 md:h-80 rounded-xl overflow-hidden mb-8 relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent z-10"></div>
+        <img 
+          src={show.imageUrl} 
+          alt={`${show.city} show`}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute bottom-0 left-0 right-0 p-6 z-20">
+          <span className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-medium uppercase tracking-wide mb-4">
+            {show.isTour ? "Tour Date" : "Special Show"}
+          </span>
+          <h1 className="text-3xl md:text-4xl font-display font-bold mb-2 text-white drop-shadow-md">
+            {show.city}
+          </h1>
+          <div className="flex flex-wrap gap-4 text-sm text-white/90 mb-2">
+            <div className="flex items-center">
+              <Calendar size={16} className="mr-1" />
+              {show.date}
             </div>
-            
-            <div className="prose prose-stone max-w-none">
-              <p>{show.description}</p>
-              
-              <h3 className="text-xl font-semibold mt-8 mb-3">Venue Information</h3>
-              <p className="text-muted-foreground">{show.address}</p>
-              
-              <h3 className="text-xl font-semibold mt-6 mb-3">Show Policies</h3>
-              <p className="text-muted-foreground">{show.venuePolicies}</p>
+            <div className="flex items-center">
+              <Clock size={16} className="mr-1" />
+              {show.time} ({show.duration})
+            </div>
+            <div className="flex items-center">
+              <MapPin size={16} className="mr-1" />
+              {show.venue}
             </div>
           </div>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <Tabs 
+            defaultValue="details" 
+            className="w-full"
+            onValueChange={setActiveTab}
+            value={activeTab}
+          >
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
+              <TabsTrigger value="details" className="text-sm">Details</TabsTrigger>
+              <TabsTrigger value="media" className="text-sm">Media</TabsTrigger>
+              <TabsTrigger value="venue" className="text-sm">Venue</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="details" className="space-y-6">
+              <div className="prose prose-stone max-w-none">
+                <h2 className="text-2xl font-semibold mb-4">About This Show</h2>
+                <p>{show.description}</p>
+              </div>
+                
+              <div>
+                <h3 className="text-xl font-semibold mt-6 mb-3">Show Policies</h3>
+                <p className="text-muted-foreground">{show.venuePolicies}</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="media" className="space-y-6">
+              {show.youtubeId ? (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold mb-4">Show Preview</h2>
+                  <div className="rounded-md overflow-hidden">
+                    <AspectRatio ratio={16 / 9}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${show.youtubeId}`}
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="w-full h-full border-0"
+                      ></iframe>
+                    </AspectRatio>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-muted/50 rounded-md p-8 flex flex-col items-center justify-center text-center">
+                  <Youtube size={48} className="text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-medium mb-2">Video Coming Soon</h3>
+                  <p className="text-muted-foreground">
+                    We're working on a preview video for this show. Check back later!
+                  </p>
+                </div>
+              )}
+              
+              {show.galleryImages && show.galleryImages.length > 0 && (
+                <div className="space-y-4 mt-8">
+                  <h2 className="text-2xl font-semibold mb-4">Gallery</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {show.galleryImages.map((img, index) => (
+                      <div key={index} className="rounded-md overflow-hidden h-48 bg-muted">
+                        <img 
+                          src={img} 
+                          alt={`${show.city} show gallery ${index + 1}`} 
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="venue" className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Venue Information</h2>
+                <p className="text-lg font-medium">{show.venue}</p>
+                <p className="text-muted-foreground">{show.address}</p>
+                
+                <div className="mt-6 rounded-md overflow-hidden border">
+                  <AspectRatio ratio={16 / 9}>
+                    <iframe 
+                      src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(show.venue + ' ' + show.address)}`}
+                      title="Google Maps"
+                      className="w-full h-full border-0"
+                      allowFullScreen
+                    ></iframe>
+                  </AspectRatio>
+                </div>
+                
+                <div className="flex items-center justify-center mt-4">
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(show.venue + ' ' + show.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary flex items-center"
+                  >
+                    <ExternalLink size={14} className="mr-1" />
+                    Open in Google Maps
+                  </a>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
         
         <div className="lg:col-span-1">
