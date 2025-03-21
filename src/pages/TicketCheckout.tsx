@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Calendar, MapPin, Clock, CreditCard, User, Mail, Phone } from "lucide-react";
@@ -6,9 +7,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-// Mock show data (same as in ShowDetails.tsx)
+// Mock show data
 const allShows = [
   {
     id: 1,
@@ -98,29 +100,10 @@ const allShows = [
 
 // Ticket types
 const ticketTypes = [
-  { id: 1, name: "General Admission", price: 45, available: true },
-  { id: 2, name: "VIP Package", price: 95, available: true, description: "Includes meet & greet and signed merchandise" },
-  { id: 3, name: "Front Row Seats", price: 75, available: false },
-  { id: 4, name: "Group Package (4+ tickets)", price: 40, available: true, description: "Per person, minimum 4 tickets" }
-];
-
-// Seating sections
-const seatingSections = [
-  {
-    id: "orchestra",
-    name: "Orchestra",
-    price: 75,
-  },
-  {
-    id: "mezzanine",
-    name: "Mezzanine",
-    price: 55,
-  },
-  {
-    id: "balcony",
-    name: "Balcony",
-    price: 45,
-  }
+  { id: 1, name: "Regular Admission", price: 45, available: true, code: "REG" },
+  { id: 2, name: "VIP Package", price: 95, available: true, code: "VIP", description: "Includes meet & greet and signed merchandise" },
+  { id: 3, name: "Table for 5", price: 225, available: true, code: "T5", description: "Reserved table for 5 people (includes 5 tickets)" },
+  { id: 4, name: "Table for 10", price: 400, available: true, code: "T10", description: "Reserved table for 10 people (includes 10 tickets)" }
 ];
 
 const TicketCheckout = () => {
@@ -144,14 +127,18 @@ const TicketCheckout = () => {
   // Find the show based on the ID from URL params
   const show = allShows.find(s => s.id === parseInt(id || "0"));
   
-  // Get ticket type or selected seats from URL params
-  const ticketTypeId = searchParams.get("type");
-  const sectionId = searchParams.get("section");
-  const selectedSeatsParam = searchParams.get("seats");
-  const selectedSeats = selectedSeatsParam ? selectedSeatsParam.split(",") : [];
+  // Parse selected ticket types from URL params
+  const selectedTickets = searchParams.getAll('tickets').map(param => {
+    const [ticketId, quantity] = param.split(':');
+    return {
+      id: parseInt(ticketId),
+      quantity: parseInt(quantity),
+      type: ticketTypes.find(t => t.id === parseInt(ticketId))
+    };
+  });
   
-  const ticketType = ticketTypeId ? ticketTypes.find(t => t.id === parseInt(ticketTypeId)) : null;
-  const section = sectionId ? seatingSections.find(s => s.id === sectionId) : null;
+  // Parse selected seats from URL params
+  const selectedSeats = searchParams.getAll('seats');
   
   if (!show) {
     return (
@@ -177,37 +164,46 @@ const TicketCheckout = () => {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Submit order (this would typically involve an API call)
-      navigate(`/shows/${id}/confirmation`);
+      // Create params to pass to confirmation page
+      const params = new URLSearchParams(searchParams);
+      
+      // Add form data we might need
+      params.set('name', `${formData.firstName} ${formData.lastName}`);
+      params.set('email', formData.email);
+      
+      // Navigate to confirmation
+      navigate(`/shows/${id}/confirmation?${params.toString()}`);
     }
   };
   
-  const calculateTotal = () => {
-    if (ticketType) {
-      return ticketType.price;
-    } else if (section && selectedSeats.length > 0) {
-      return section.price * selectedSeats.length;
-    }
-    return 0;
+  const calculateSubtotal = () => {
+    return selectedTickets.reduce((sum, ticket) => {
+      return sum + ((ticket.type?.price || 0) * ticket.quantity);
+    }, 0);
   };
   
   const calculateFees = () => {
-    return calculateTotal() * 0.15; // 15% service fee
+    return calculateSubtotal() * 0.15; // 15% service fee
   };
   
   const calculateGrandTotal = () => {
-    return calculateTotal() + calculateFees();
+    return calculateSubtotal() + calculateFees();
+  };
+  
+  // Helper to group selected seats by type
+  const getSeatsByType = (type: string) => {
+    return selectedSeats.filter(seat => seat.startsWith(type));
   };
   
   return (
     <div className="container px-4 py-12 md:py-16 max-w-4xl">
       <Button 
         variant="ghost" 
-        onClick={() => navigate(`/shows/${id}`)}
+        onClick={() => navigate(`/shows/${id}/seating?${searchParams.toString()}`)}
         className="mb-6"
       >
         <ArrowLeft size={16} className="mr-2" />
-        Back to Show Details
+        Back to Seating Selection
       </Button>
       
       <div className="mb-10">
@@ -236,30 +232,43 @@ const TicketCheckout = () => {
               )}>
                 1
               </div>
-              <h2 className="text-lg font-semibold">Ticket Information</h2>
+              <h2 className="text-lg font-semibold">Review Your Selections</h2>
             </div>
             
             <Card className={cn(step !== 1 && "hidden")}>
-              <CardContent className="p-6">
-                {ticketType ? (
-                  <div>
-                    <h3 className="font-semibold mb-2">{ticketType.name}</h3>
-                    {ticketType.description && (
-                      <p className="text-sm text-muted-foreground mb-4">{ticketType.description}</p>
-                    )}
-                    <p className="font-medium">Price: ${ticketType.price}</p>
-                  </div>
-                ) : section && selectedSeats.length > 0 ? (
-                  <div>
-                    <h3 className="font-semibold mb-2">{section.name} Section</h3>
-                    <p className="text-sm mb-4">
-                      {selectedSeats.length} {selectedSeats.length === 1 ? 'seat' : 'seats'} selected: {selectedSeats.join(', ')}
-                    </p>
-                    <p className="font-medium">Price: ${section.price} per seat (${section.price * selectedSeats.length} total)</p>
-                  </div>
-                ) : (
-                  <p>No ticket information found</p>
-                )}
+              <CardContent className="p-6 space-y-4">
+                {/* Ticket details */}
+                <div>
+                  <h3 className="font-semibold mb-3">Your Tickets</h3>
+                  {selectedTickets.map((ticket, index) => (
+                    <div key={index} className="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-0">
+                      <div className="flex justify-between mb-2">
+                        <div className="font-medium">
+                          {ticket.type?.name}
+                          {ticket.type?.code && (
+                            <Badge variant="outline" className="ml-2 text-xs">{ticket.type.code}</Badge>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <div>${ticket.type?.price} x {ticket.quantity}</div>
+                          <div className="text-sm text-muted-foreground">${(ticket.type?.price || 0) * ticket.quantity}</div>
+                        </div>
+                      </div>
+                      
+                      {/* Show selected seats for this ticket type, if any */}
+                      {ticket.type?.code && (
+                        <div className="text-sm text-muted-foreground">
+                          {getSeatsByType(ticket.type.code).length > 0 ? (
+                            <div className="flex items-start gap-2">
+                              <span>Selected:</span>
+                              <span>{getSeatsByType(ticket.type.code).join(", ")}</span>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </CardContent>
               <CardFooter className="px-6 py-4 bg-muted/50 flex justify-end">
                 <Button onClick={handleContinue}>
@@ -452,23 +461,20 @@ const TicketCheckout = () => {
         </div>
         
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="sticky top-4">
             <CardHeader className="pb-3">
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent className="pb-0">
               <div className="space-y-4">
-                {ticketType ? (
-                  <div className="flex justify-between">
-                    <span>{ticketType.name}</span>
-                    <span>${ticketType.price}</span>
+                {selectedTickets.map((ticket, index) => (
+                  <div key={index} className="flex justify-between">
+                    <span>
+                      {ticket.type?.name} x {ticket.quantity}
+                    </span>
+                    <span>${(ticket.type?.price || 0) * ticket.quantity}</span>
                   </div>
-                ) : section && selectedSeats.length > 0 ? (
-                  <div className="flex justify-between">
-                    <span>{section.name} ({selectedSeats.length} {selectedSeats.length === 1 ? 'seat' : 'seats'})</span>
-                    <span>${section.price * selectedSeats.length}</span>
-                  </div>
-                ) : null}
+                ))}
                 
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Service & Facility Fee</span>

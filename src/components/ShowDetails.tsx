@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar, MapPin, Clock, ArrowLeft, Ticket, Youtube, ExternalLink } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowLeft, Ticket, Youtube, ExternalLink, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -8,112 +8,15 @@ import { cn } from "@/lib/utils";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 
 // Ticket types data
 const ticketTypes = [
-  { id: 1, name: "General Admission", price: 45, available: true },
-  { id: 2, name: "VIP Package", price: 95, available: true, description: "Includes meet & greet and signed merchandise" },
-  { id: 3, name: "Front Row Seats", price: 75, available: false },
-  { id: 4, name: "Group Package (4+ tickets)", price: 40, available: true, description: "Per person, minimum 4 tickets" }
-];
-
-type SeatSection = {
-  id: string;
-  name: string;
-  price: number;
-  available: boolean;
-  rows: {
-    row: string;
-    seats: {
-      id: string;
-      number: string;
-      available: boolean;
-    }[];
-  }[];
-};
-
-// Seating sections
-const seatingSections: SeatSection[] = [
-  {
-    id: "orchestra",
-    name: "Orchestra",
-    price: 75,
-    available: true,
-    rows: [
-      {
-        row: "A",
-        seats: Array.from({ length: 10 }, (_, i) => ({
-          id: `A-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.3
-        }))
-      },
-      {
-        row: "B",
-        seats: Array.from({ length: 10 }, (_, i) => ({
-          id: `B-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.3
-        }))
-      },
-      {
-        row: "C",
-        seats: Array.from({ length: 10 }, (_, i) => ({
-          id: `C-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.5
-        }))
-      }
-    ]
-  },
-  {
-    id: "mezzanine",
-    name: "Mezzanine",
-    price: 55,
-    available: true,
-    rows: [
-      {
-        row: "D",
-        seats: Array.from({ length: 12 }, (_, i) => ({
-          id: `D-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.2
-        }))
-      },
-      {
-        row: "E",
-        seats: Array.from({ length: 12 }, (_, i) => ({
-          id: `E-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.2
-        }))
-      }
-    ]
-  },
-  {
-    id: "balcony",
-    name: "Balcony",
-    price: 45,
-    available: true,
-    rows: [
-      {
-        row: "F",
-        seats: Array.from({ length: 14 }, (_, i) => ({
-          id: `F-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.1
-        }))
-      },
-      {
-        row: "G",
-        seats: Array.from({ length: 14 }, (_, i) => ({
-          id: `G-${i + 1}`,
-          number: `${i + 1}`,
-          available: Math.random() > 0.1
-        }))
-      }
-    ]
-  }
+  { id: 1, name: "Regular Admission", price: 45, available: true, code: "REG" },
+  { id: 2, name: "VIP Package", price: 95, available: true, code: "VIP", description: "Includes meet & greet and signed merchandise" },
+  { id: 3, name: "Table for 5", price: 225, available: true, code: "T5", description: "Reserved table for 5 people (includes 5 tickets)" },
+  { id: 4, name: "Table for 10", price: 400, available: true, code: "T10", description: "Reserved table for 10 people (includes 10 tickets)" }
 ];
 
 // Mock tour data with additional fields
@@ -246,9 +149,9 @@ const allShows = [
 const ShowDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<string>("details");
+  const [selectedTickets, setSelectedTickets] = useState<{id: number, quantity: number}[]>([]);
+  const { toast } = useToast();
   
   // Find the show based on the ID from URL params
   const show = allShows.find(s => s.id === parseInt(id || "0"));
@@ -265,12 +168,72 @@ const ShowDetails = () => {
     );
   }
 
-  const toggleSeat = (seatId: string) => {
-    setSelectedSeats(prev => 
-      prev.includes(seatId) 
-        ? prev.filter(id => id !== seatId)
-        : [...prev, seatId]
-    );
+  const handleQuantityChange = (ticketId: number, change: number) => {
+    setSelectedTickets(prev => {
+      const existing = prev.find(t => t.id === ticketId);
+      
+      if (!existing && change > 0) {
+        // Add new ticket type
+        return [...prev, { id: ticketId, quantity: change }];
+      } else if (existing) {
+        const newQuantity = existing.quantity + change;
+        
+        if (newQuantity <= 0) {
+          // Remove ticket type
+          return prev.filter(t => t.id !== ticketId);
+        } else {
+          // Update quantity
+          return prev.map(t => 
+            t.id === ticketId ? { ...t, quantity: newQuantity } : t
+          );
+        }
+      }
+      return prev;
+    });
+  };
+
+  const getTicketQuantity = (ticketId: number) => {
+    const ticket = selectedTickets.find(t => t.id === ticketId);
+    return ticket ? ticket.quantity : 0;
+  };
+
+  const getTotalTickets = () => {
+    return selectedTickets.reduce((sum, ticket) => {
+      const ticketType = ticketTypes.find(t => t.id === ticket.id);
+      if (ticketType && ticketType.code === "T5") {
+        return sum + (ticket.quantity * 5);
+      } else if (ticketType && ticketType.code === "T10") {
+        return sum + (ticket.quantity * 10);
+      } else {
+        return sum + ticket.quantity;
+      }
+    }, 0);
+  };
+
+  const getTotalPrice = () => {
+    return selectedTickets.reduce((sum, ticket) => {
+      const ticketType = ticketTypes.find(t => t.id === ticket.id);
+      return sum + ((ticketType?.price || 0) * ticket.quantity);
+    }, 0);
+  };
+  
+  const proceedToSeatSelection = () => {
+    if (selectedTickets.length === 0) {
+      toast({
+        title: "No tickets selected",
+        description: "Please select at least one ticket to continue",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create URL params with selected tickets
+    const params = new URLSearchParams();
+    selectedTickets.forEach(ticket => {
+      params.append('tickets', `${ticket.id}:${ticket.quantity}`);
+    });
+    
+    navigate(`/shows/${id}/seating?${params.toString()}`);
   };
 
   return (
@@ -430,116 +393,84 @@ const ShowDetails = () => {
                 </div>
               ) : (
                 <>
-                  <h4 className="font-medium mb-2">Ticket Options</h4>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead className="text-right">Action</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {ticketTypes.map((ticket) => (
-                        <TableRow key={ticket.id}>
-                          <TableCell className="font-medium">
-                            {ticket.name}
-                            {ticket.description && (
-                              <p className="text-xs text-muted-foreground">{ticket.description}</p>
-                            )}
-                          </TableCell>
-                          <TableCell>${ticket.price}</TableCell>
-                          <TableCell className="text-right">
-                            {ticket.available ? (
-                              <Link to={`/shows/${show.id}/tickets?type=${ticket.id}`}>
-                                <Button size="sm" variant="outline">Select</Button>
-                              </Link>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">Unavailable</span>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  
-                  <div className="mt-6 mb-2">
-                    <h4 className="font-medium mb-4">Reserved Seating</h4>
-                    <div className="space-y-2">
-                      {seatingSections.map((section) => (
-                        <div key={section.id}>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-between mb-2"
-                            onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
-                          >
-                            {section.name} - ${section.price}
-                            <span className="text-xs">
-                              {activeSection === section.id ? "Hide" : "View Seats"}
-                            </span>
-                          </Button>
-                          
-                          {activeSection === section.id && (
-                            <div className="p-4 bg-muted/50 rounded-md mb-4">
-                              <div className="mb-4 text-center">
-                                <div className="w-3/4 h-6 bg-primary/20 mx-auto mb-6 rounded-t-xl text-xs flex items-center justify-center text-primary/70">Stage</div>
-                              </div>
-                              
-                              {section.rows.map((row) => (
-                                <div key={row.row} className="mb-2">
-                                  <div className="flex items-center mb-1">
-                                    <span className="text-xs font-medium w-6">{row.row}</span>
-                                    <div className="flex flex-wrap gap-1">
-                                      {row.seats.map((seat) => (
-                                        <button
-                                          key={seat.id}
-                                          disabled={!seat.available}
-                                          onClick={() => seat.available && toggleSeat(seat.id)}
-                                          className={cn(
-                                            "w-6 h-6 text-xs rounded flex items-center justify-center transition-colors",
-                                            !seat.available && "bg-gray-200 text-gray-400 cursor-not-allowed",
-                                            seat.available && !selectedSeats.includes(seat.id) && "bg-white border hover:bg-primary/5",
-                                            selectedSeats.includes(seat.id) && "bg-primary text-white"
-                                          )}
-                                        >
-                                          {seat.number}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                              
-                              <div className="flex items-center justify-between text-xs text-muted-foreground mt-4">
-                                <div className="flex items-center">
-                                  <div className="w-4 h-4 bg-white border rounded mr-1"></div>
-                                  <span>Available</span>
-                                </div>
-                                <div className="flex items-center">
-                                  <div className="w-4 h-4 bg-primary rounded mr-1"></div>
-                                  <span>Selected</span>
-                                </div>
-                                <div className="flex items-center">
-                                  <div className="w-4 h-4 bg-gray-200 rounded mr-1"></div>
-                                  <span>Taken</span>
-                                </div>
-                              </div>
-                              
-                              {selectedSeats.length > 0 && (
-                                <div className="mt-4">
-                                  <Link to={`/shows/${show.id}/tickets?section=${section.id}&seats=${selectedSeats.join(',')}`}>
-                                    <Button className="w-full">
-                                      Continue with {selectedSeats.length} {selectedSeats.length === 1 ? 'seat' : 'seats'}
-                                    </Button>
-                                  </Link>
-                                </div>
+                  <h4 className="font-medium mb-4">Select Tickets</h4>
+                  <div className="space-y-4">
+                    {ticketTypes.map((ticket) => (
+                      <div key={ticket.id} className="p-3 rounded-md border">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <div className="font-medium flex items-center gap-2">
+                              {ticket.name}
+                              {ticket.code && (
+                                <Badge variant="outline" className="text-xs">{ticket.code}</Badge>
                               )}
                             </div>
-                          )}
+                            {ticket.description && (
+                              <p className="text-xs text-muted-foreground mt-1">{ticket.description}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold">${ticket.price}</div>
+                            <div className="text-xs text-muted-foreground">per {ticket.code?.startsWith('T') ? 'table' : 'ticket'}</div>
+                          </div>
                         </div>
-                      ))}
-                    </div>
+                        
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="text-sm text-muted-foreground">
+                            {ticket.code === "T5" && "Includes 5 tickets"}
+                            {ticket.code === "T10" && "Includes 10 tickets"}
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleQuantityChange(ticket.id, -1)}
+                              disabled={getTicketQuantity(ticket.id) === 0}
+                            >
+                              <Minus size={14} />
+                            </Button>
+                            <span className="w-6 text-center font-medium">
+                              {getTicketQuantity(ticket.id)}
+                            </span>
+                            <Button 
+                              variant="outline" 
+                              size="icon" 
+                              className="h-8 w-8"
+                              onClick={() => handleQuantityChange(ticket.id, 1)}
+                            >
+                              <Plus size={14} />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                  
+                  {selectedTickets.length > 0 && (
+                    <>
+                      <Separator className="my-4" />
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Total tickets:</span>
+                          <span>{getTotalTickets()} tickets</span>
+                        </div>
+                        <div className="flex justify-between font-medium">
+                          <span>Total price:</span>
+                          <span>${getTotalPrice()}</span>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        className="w-full mt-4"
+                        onClick={proceedToSeatSelection}
+                      >
+                        Select Seats/Tables
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </CardContent>
