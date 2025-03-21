@@ -43,7 +43,10 @@ const Hero = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce">
+      {/* Bottom fade transition to Tour section */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-secondary to-transparent z-10"></div>
+
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce z-20">
         <a href="#tour" className="text-primary/50 hover:text-primary transition-colors">
           <svg
             xmlns="http://www.w3.org/2000/svg"
