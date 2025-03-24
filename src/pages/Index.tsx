@@ -1,11 +1,9 @@
-
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import FeaturedShow from "@/components/FeaturedShow";
 import TourDates from "@/components/TourDates";
 import About from "@/components/About";
 import Newsletter from "@/components/Newsletter";
-import Footer from "@/components/Footer";
 import SponsorsCarousel from "@/components/SponsorsCarousel";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
@@ -105,8 +103,8 @@ const Index = () => {
                       <Badge 
                         variant={
                           show.status === "Sold Out" ? "destructive" : 
-                          show.status === "Few Left" ? "warning" : 
-                          "success"
+                          show.status === "Few Left" ? "secondary" : 
+                          "default"
                         }
                       >
                         {show.status}
