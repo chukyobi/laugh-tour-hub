@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
-import { cn } from "@/lib/utils";
+import CartoonSeatMap, { Selection } from "@/components/CartoonSeatMap";
 
 // Mock show data (same as in ShowDetails.tsx)
 const allShows = [
@@ -76,48 +75,6 @@ const ticketTypes = [
   { id: 4, name: "Table for 10", price: 400, available: true, code: "T10", description: "Reserved table for 10 people (includes 10 tickets)" }
 ];
 
-// Define seating layout
-const tablesFor5 = [
-  { id: "T5-A", name: "Table A", status: "available" },
-  { id: "T5-B", name: "Table B", status: "available" },
-  { id: "T5-C", name: "Table C", status: "available" },
-  { id: "T5-D", name: "Table D", status: "available" },
-  { id: "T5-E", name: "Table E", status: "taken" },
-  { id: "T5-F", name: "Table F", status: "available" },
-  { id: "T5-G", name: "Table G", status: "available" },
-  { id: "T5-H", name: "Table H", status: "taken" },
-];
-
-const tablesFor10 = [
-  { id: "T10-A", name: "Table A", status: "available" },
-  { id: "T10-B", name: "Table B", status: "available" },
-  { id: "T10-C", name: "Table C", status: "taken" },
-  { id: "T10-D", name: "Table D", status: "available" },
-];
-
-const vipSeats = Array.from({ length: 20 }, (_, i) => ({
-  id: `VP-${i + 1}`,
-  name: `Seat ${i + 1}`,
-  status: Math.random() > 0.3 ? "available" : "taken"
-}));
-
-const regularSeats = Array.from({ length: 50 }, (_, i) => ({
-  id: `REG-${i + 1}`,
-  name: `Seat ${i + 1}`,
-  status: Math.random() > 0.2 ? "available" : "taken"
-}));
-
-type Selection = {
-  id: string;
-  type: "T5" | "T10" | "VIP" | "REG";
-  name: string;
-};
-
-type SelectedTicket = {
-  id: number;
-  quantity: number;
-};
-
 const SeatSelection = () => {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
@@ -125,8 +82,8 @@ const SeatSelection = () => {
   const { toast } = useToast();
   
   // Parse selected ticket types from URL params
-  const selectedTickets: SelectedTicket[] = useMemo(() => {
-    const tickets: SelectedTicket[] = [];
+  const selectedTickets = useMemo(() => {
+    const tickets: { id: number; quantity: number }[] = [];
     searchParams.getAll('tickets').forEach(param => {
       const [ticketId, quantity] = param.split(':');
       tickets.push({
@@ -239,7 +196,7 @@ const SeatSelection = () => {
       params.append('seats', `${selection.id}`);
     });
     
-    navigate(`/shows/${id}/tickets?${params.toString()}`);
+    navigate(`/shows/${id}/checkout?${params.toString()}`);
   };
 
   return (
@@ -272,174 +229,12 @@ const SeatSelection = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="w-full overflow-auto p-4">
-                <div className="min-w-[600px]">
-                  {/* Stage */}
-                  <div className="w-full h-12 bg-primary/20 mb-12 rounded-t-xl text-xs flex items-center justify-center text-primary font-medium">
-                    STAGE
-                  </div>
-                  
-                  {/* Tables (front row) */}
-                  <div className="mb-16">
-                    <h3 className="text-sm font-medium mb-4 text-center">Premium Tables</h3>
-                    
-                    {/* Tables for 10 */}
-                    <div className="flex justify-center gap-6 mb-8">
-                      {tablesFor10.map(table => (
-                        <TooltipProvider key={table.id}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                disabled={table.status === "taken"}
-                                onClick={() => toggleSelection(table, "T10")}
-                                className={cn(
-                                  "w-16 h-16 rounded-full flex items-center justify-center text-xs transition",
-                                  table.status === "taken" && "bg-gray-200 text-gray-400 cursor-not-allowed",
-                                  table.status === "available" && !selections.some(s => s.id === table.id) && 
-                                    "bg-secondary hover:bg-secondary/80 border-2 border-dashed border-border",
-                                  selections.some(s => s.id === table.id) && "bg-primary text-primary-foreground"
-                                )}
-                              >
-                                <div className="text-center">
-                                  <div className="font-medium">{table.name}</div>
-                                  <div className="text-[10px]">{table.id}</div>
-                                </div>
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{table.status === "taken" ? "Already reserved" : "Table for 10"}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      ))}
-                    </div>
-                    
-                    {/* Tables for 5 */}
-                    <div className="flex justify-center flex-wrap gap-4">
-                      {tablesFor5.map(table => (
-                        <TooltipProvider key={table.id}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                disabled={table.status === "taken"}
-                                onClick={() => toggleSelection(table, "T5")}
-                                className={cn(
-                                  "w-12 h-12 rounded-full flex items-center justify-center text-xs transition",
-                                  table.status === "taken" && "bg-gray-200 text-gray-400 cursor-not-allowed",
-                                  table.status === "available" && !selections.some(s => s.id === table.id) && 
-                                    "bg-secondary hover:bg-secondary/80 border-2 border-dashed border-border",
-                                  selections.some(s => s.id === table.id) && "bg-primary text-primary-foreground"
-                                )}
-                              >
-                                <div className="text-center">
-                                  <div className="font-medium">{table.name}</div>
-                                  <div className="text-[10px]">{table.id}</div>
-                                </div>
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{table.status === "taken" ? "Already reserved" : "Table for 5"}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* VIP Seats (sides) */}
-                  <div className="mb-12">
-                    <div className="flex justify-between">
-                      <div className="w-1/5">
-                        <h3 className="text-sm font-medium mb-3 text-center">VIP Left</h3>
-                        <div className="flex flex-col gap-2 items-center">
-                          {vipSeats.slice(0, 10).map(seat => (
-                            <button
-                              key={seat.id}
-                              disabled={seat.status === "taken"}
-                              onClick={() => toggleSelection(seat, "VIP")}
-                              className={cn(
-                                "w-10 h-8 flex items-center justify-center text-xs rounded transition",
-                                seat.status === "taken" && "bg-gray-200 text-gray-400 cursor-not-allowed",
-                                seat.status === "available" && !selections.some(s => s.id === seat.id) && 
-                                  "bg-secondary/50 hover:bg-secondary border border-border",
-                                selections.some(s => s.id === seat.id) && "bg-primary text-primary-foreground"
-                              )}
-                            >
-                              {seat.id}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="w-3/5">
-                        {/* Empty space for middle section */}
-                      </div>
-                      
-                      <div className="w-1/5">
-                        <h3 className="text-sm font-medium mb-3 text-center">VIP Right</h3>
-                        <div className="flex flex-col gap-2 items-center">
-                          {vipSeats.slice(10, 20).map(seat => (
-                            <button
-                              key={seat.id}
-                              disabled={seat.status === "taken"}
-                              onClick={() => toggleSelection(seat, "VIP")}
-                              className={cn(
-                                "w-10 h-8 flex items-center justify-center text-xs rounded transition",
-                                seat.status === "taken" && "bg-gray-200 text-gray-400 cursor-not-allowed",
-                                seat.status === "available" && !selections.some(s => s.id === seat.id) && 
-                                  "bg-secondary/50 hover:bg-secondary border border-border",
-                                selections.some(s => s.id === seat.id) && "bg-primary text-primary-foreground"
-                              )}
-                            >
-                              {seat.id}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Regular Seats (back rows) */}
-                  <div>
-                    <h3 className="text-sm font-medium mb-3 text-center">Regular Seating</h3>
-                    <div className="flex justify-center">
-                      <div className="flex flex-wrap justify-center gap-1 max-w-[600px]">
-                        {regularSeats.map(seat => (
-                          <button
-                            key={seat.id}
-                            disabled={seat.status === "taken"}
-                            onClick={() => toggleSelection(seat, "REG")}
-                            className={cn(
-                              "w-8 h-7 flex items-center justify-center text-[10px] rounded transition",
-                              seat.status === "taken" && "bg-gray-200 text-gray-400 cursor-not-allowed",
-                              seat.status === "available" && !selections.some(s => s.id === seat.id) && 
-                                "bg-muted hover:bg-muted/80 border border-border",
-                              selections.some(s => s.id === seat.id) && "bg-primary text-primary-foreground"
-                            )}
-                          >
-                            {seat.id}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground mt-4">
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-secondary/50 border border-border rounded mr-1"></div>
-                  <span>Available</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-primary rounded mr-1"></div>
-                  <span>Selected</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-4 h-4 bg-gray-200 rounded mr-1"></div>
-                  <span>Taken</span>
-                </div>
-              </div>
+              <CartoonSeatMap
+                requiredSelections={requiredSelections}
+                selectionCounts={selectionCounts}
+                selections={selections}
+                toggleSelection={toggleSelection}
+              />
             </CardContent>
           </Card>
         </div>

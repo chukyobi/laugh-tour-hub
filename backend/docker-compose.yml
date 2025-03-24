@@ -1,0 +1,41 @@
+
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db:3306
+      - DB_USER=root
+      - DB_PASS=password
+      - DB_NAME=ticketing
+    volumes:
+      - ./:/app
+    networks:
+      - ticketing-network
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=ticketing
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - mysql-data:/var/lib/mysql
+    networks:
+      - ticketing-network
+
+volumes:
+  mysql-data:
+
+networks:
+  ticketing-network:
+    driver: bridge
