@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import FeaturedShow from "@/components/FeaturedShow";
@@ -5,6 +6,7 @@ import TourDates from "@/components/TourDates";
 import About from "@/components/About";
 import Newsletter from "@/components/Newsletter";
 import SponsorsCarousel from "@/components/SponsorsCarousel";
+import Footer from "@/components/Footer";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
