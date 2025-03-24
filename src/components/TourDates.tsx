@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 // Tour date data - upcoming shows
 const upcomingShows = [
@@ -179,7 +179,7 @@ const TourDates = () => {
                     </p>
                     
                     <Link
-                      to={show.ticketLink}
+                      href={show.ticketLink}
                       className={cn(
                         "w-full inline-flex items-center justify-center rounded-md py-2 px-4 text-sm font-medium transition-all",
                         show.status === "Sold Out"
@@ -232,7 +232,7 @@ const TourDates = () => {
                     </p>
                     
                     <Link
-                      to={show.videoLink}
+                      href={show.videoLink}
                       className="w-full inline-flex items-center justify-center rounded-md py-2 px-4 text-sm font-medium bg-secondary hover:bg-secondary/80 transition-all"
                     >
                       <Clock size={16} className="mr-2" />

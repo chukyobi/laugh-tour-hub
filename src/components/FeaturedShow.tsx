@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 // Get the next upcoming show (first one that's not sold out)
 const nextShow = {
@@ -16,7 +16,7 @@ const nextShow = {
   venue: "Wilbur Theatre",
   address: "246 Tremont St, Boston, MA 02116",
   status: "Available",
-  ticketLink: "/shows/2/tickets",
+  ticketLink: "/shows/2",
   isTour: true,
   imageUrl: "https://images.unsplash.com/photo-1525013066836-c6090f0ad9d8?q=80&w=800",
   description: "Don't miss the Boston leg of Alex's 'Everyday Extraordinary' tour. Following his sold-out show last year, Alex returns to the Wilbur with fresh material and his trademark observational wit. This performance features a special Q&A segment at the end, where Alex will take questions from the audience."
@@ -70,7 +70,7 @@ const FeaturedShow = () => {
               </div>
               
               <div className="space-y-4">
-                <Link to={`/shows/${nextShow.id}`} className="w-full">
+                <Link href={`/shows/${nextShow.id}`} className="w-full">
                   <Button 
                     className="w-full group bg-primary hover:bg-primary/90"
                   >
@@ -79,7 +79,7 @@ const FeaturedShow = () => {
                   </Button>
                 </Link>
                 
-                <Link to={`/shows/${nextShow.id}/tickets`} className="w-full">
+                <Link href={`/shows/${nextShow.id}/seating`} className="w-full">
                   <Button 
                     variant="outline"
                     className="w-full border-primary/20 hover:bg-secondary"
