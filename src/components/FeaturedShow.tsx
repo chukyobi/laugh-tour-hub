@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 // Get the next upcoming show (first one that's not sold out)
 const nextShow = {
@@ -70,7 +70,7 @@ const FeaturedShow = () => {
               </div>
               
               <div className="space-y-4">
-                <Link href={`/shows/${nextShow.id}`} className="w-full">
+                <Link to={`/shows/${nextShow.id}`} className="w-full">
                   <Button 
                     className="w-full group bg-primary hover:bg-primary/90"
                   >
@@ -79,7 +79,7 @@ const FeaturedShow = () => {
                   </Button>
                 </Link>
                 
-                <Link href={`/shows/${nextShow.id}/seating`} className="w-full">
+                <Link to={`/shows/${nextShow.id}/seating`} className="w-full">
                   <Button 
                     variant="outline"
                     className="w-full border-primary/20 hover:bg-secondary"

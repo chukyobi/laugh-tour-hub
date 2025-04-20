@@ -1,6 +1,6 @@
+
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Info, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -150,7 +150,7 @@ interface SeatSelectionProps {
 }
 
 const SeatSelection = ({ showId }: SeatSelectionProps) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { toast } = useToast();
   
   const [activeTab, setActiveTab] = useState("seating");
@@ -228,7 +228,7 @@ const SeatSelection = ({ showId }: SeatSelectionProps) => {
     }
     
     // In a real app, you'd save the selection state to a context or store
-    router.push(`/shows/${showId}/checkout`);
+    navigate(`/shows/${showId}/checkout`);
   };
 
   if (!selectedShow) {
@@ -236,7 +236,7 @@ const SeatSelection = ({ showId }: SeatSelectionProps) => {
       <div className="container py-8">
         <p>Show not found.</p>
         <Button asChild>
-          <Link href="/">Back to Home</Link>
+          <Link to="/">Back to Home</Link>
         </Button>
       </div>
     );
@@ -246,7 +246,7 @@ const SeatSelection = ({ showId }: SeatSelectionProps) => {
     <div className="container py-8 px-4">
       <div className="mb-8">
         <Button variant="ghost" asChild>
-          <Link href={`/shows/${showId}`} className="flex items-center">
+          <Link to={`/shows/${showId}`} className="flex items-center">
             <ArrowLeft size={16} className="mr-2" />
             Back to Show Details
           </Link>

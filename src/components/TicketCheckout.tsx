@@ -1,7 +1,5 @@
-
 import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Calendar, Check, CreditCard, Info, MapPin, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,7 +72,7 @@ interface TicketCheckoutProps {
 }
 
 const TicketCheckout = ({ showId }: TicketCheckoutProps) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -89,7 +87,7 @@ const TicketCheckout = ({ showId }: TicketCheckoutProps) => {
       <div className="container py-8">
         <p>Show not found.</p>
         <Button asChild>
-          <Link href="/">Back to Home</Link>
+          <Link to="/">Back to Home</Link>
         </Button>
       </div>
     );
@@ -116,7 +114,7 @@ const TicketCheckout = ({ showId }: TicketCheckoutProps) => {
         title: "Payment successful!",
         description: "Your tickets have been booked and emailed to you.",
       });
-      router.push("/");
+      navigate("/");
     }, 1500);
   };
   
@@ -124,7 +122,7 @@ const TicketCheckout = ({ showId }: TicketCheckoutProps) => {
     <div className="container py-8 px-4">
       <div className="mb-8">
         <Button variant="ghost" asChild>
-          <Link href={`/shows/${showId}/seating`} className="flex items-center">
+          <Link to={`/shows/${showId}/seating`} className="flex items-center">
             <ArrowLeft size={16} className="mr-2" />
             Back to Seating
           </Link>

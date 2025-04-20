@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ShowDetails from "./components/ShowDetails";
@@ -13,6 +13,22 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 
 const queryClient = new QueryClient();
 
+// Wrapper components to extract and pass ID params
+const ShowDetailsWrapper = () => {
+  const { id } = useParams();
+  return <ShowDetails showId={id || ""} />;
+};
+
+const SeatSelectionWrapper = () => {
+  const { id } = useParams();
+  return <SeatSelection showId={id || ""} />;
+};
+
+const TicketCheckoutWrapper = () => {
+  const { id } = useParams();
+  return <TicketCheckout showId={id || ""} />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -21,10 +37,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/shows/:id" element={<ShowDetails />} />
-          <Route path="/shows/:id/tickets" element={<ShowDetails />} />
-          <Route path="/shows/:id/seating" element={<SeatSelection />} />
-          <Route path="/shows/:id/checkout" element={<TicketCheckout />} />
+          <Route path="/shows/:id" element={<ShowDetailsWrapper />} />
+          <Route path="/shows/:id/tickets" element={<ShowDetailsWrapper />} />
+          <Route path="/shows/:id/seating" element={<SeatSelectionWrapper />} />
+          <Route path="/shows/:id/checkout" element={<TicketCheckoutWrapper />} />
           <Route path="/shows/:id/confirmation" element={<OrderConfirmation />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

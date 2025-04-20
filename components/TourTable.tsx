@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 // Mock tour data for the table
 const upcomingShows = [
@@ -68,7 +68,7 @@ const TourTable = () => {
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl font-bold font-display">Upcoming Tour Dates</h2>
           <Button variant="ghost" className="flex items-center" asChild>
-            <Link href="/#tour">
+            <Link to="/#tour">
               View All <ArrowRight size={16} className="ml-2" />
             </Link>
           </Button>
@@ -107,7 +107,7 @@ const TourTable = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <Button size="sm" asChild>
-                      <Link href={`/shows/${show.id}`}>
+                      <Link to={`/shows/${show.id}`}>
                         Details
                       </Link>
                     </Button>

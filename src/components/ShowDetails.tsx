@@ -1,5 +1,5 @@
 
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { Calendar, MapPin, Clock, ArrowLeft, Ticket, Youtube, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -66,7 +66,7 @@ const ShowDetails = ({ showId }: ShowDetailsProps) => {
       <div className="container py-8">
         <p>Show not found.</p>
         <Button asChild>
-          <Link href="/">Back to Home</Link>
+          <Link to="/">Back to Home</Link>
         </Button>
       </div>
     );
@@ -76,7 +76,7 @@ const ShowDetails = ({ showId }: ShowDetailsProps) => {
     <div className="container py-8 px-4">
       <div className="mb-8">
         <Button variant="ghost" asChild>
-          <Link href="/" className="flex items-center">
+          <Link to="/" className="flex items-center">
             <ArrowLeft size={16} className="mr-2" />
             Back to Shows
           </Link>
@@ -240,7 +240,7 @@ const ShowDetails = ({ showId }: ShowDetailsProps) => {
               
               {show.status !== "Sold Out" ? (
                 <Button className="w-full" asChild>
-                  <Link href={`/shows/${show.id}/seating`}>
+                  <Link to={`/shows/${show.id}/seating`}>
                     <Ticket className="mr-2 h-4 w-4" />
                     Get Tickets
                   </Link>
