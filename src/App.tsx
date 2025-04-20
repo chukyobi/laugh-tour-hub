@@ -13,20 +13,29 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 
 const queryClient = new QueryClient();
 
+interface ShowParams {
+  id?: string;
+}
+
 // Wrapper components to extract and pass ID params
 const ShowDetailsWrapper = () => {
-  const { id } = useParams();
+  const { id } = useParams<ShowParams>();
   return <ShowDetails showId={id || ""} />;
 };
 
 const SeatSelectionWrapper = () => {
-  const { id } = useParams();
+  const { id } = useParams<ShowParams>();
   return <SeatSelection showId={id || ""} />;
 };
 
 const TicketCheckoutWrapper = () => {
-  const { id } = useParams();
+  const { id } = useParams<ShowParams>();
   return <TicketCheckout showId={id || ""} />;
+};
+
+const OrderConfirmationWrapper = () => {
+  const { id } = useParams<ShowParams>();
+  return <OrderConfirmation showId={id || ""} />;
 };
 
 const App = () => (
@@ -41,7 +50,7 @@ const App = () => (
           <Route path="/shows/:id/tickets" element={<ShowDetailsWrapper />} />
           <Route path="/shows/:id/seating" element={<SeatSelectionWrapper />} />
           <Route path="/shows/:id/checkout" element={<TicketCheckoutWrapper />} />
-          <Route path="/shows/:id/confirmation" element={<OrderConfirmation />} />
+          <Route path="/shows/:id/confirmation" element={<OrderConfirmationWrapper />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
