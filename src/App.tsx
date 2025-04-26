@@ -16,27 +16,28 @@ const queryClient = new QueryClient();
 // Properly define the params interface to fix TypeScript errors
 interface ShowParams {
   [key: string]: string | undefined;
+  id?: string;
 }
 
-// Wrapper components to extract and pass ID params
+// Wrapper components to extract and pass ID params with proper typing
 const ShowDetailsWrapper = () => {
   const { id } = useParams<ShowParams>();
-  return <ShowDetails showId={id || ""} />;
+  return id ? <ShowDetails showId={id} /> : <NotFound />;
 };
 
 const SeatSelectionWrapper = () => {
   const { id } = useParams<ShowParams>();
-  return <SeatSelection showId={id || ""} />;
+  return id ? <SeatSelection showId={id} /> : <NotFound />;
 };
 
 const TicketCheckoutWrapper = () => {
   const { id } = useParams<ShowParams>();
-  return <TicketCheckout showId={id || ""} />;
+  return id ? <TicketCheckout showId={id} /> : <NotFound />;
 };
 
 const OrderConfirmationWrapper = () => {
   const { id } = useParams<ShowParams>();
-  return <OrderConfirmation showId={id || ""} />;
+  return id ? <OrderConfirmation showId={id} /> : <NotFound />;
 };
 
 const App = () => (
