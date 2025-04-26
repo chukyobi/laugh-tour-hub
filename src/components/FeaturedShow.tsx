@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-// Get the next upcoming show (first one that's not sold out)
 const nextShow = {
   id: 2,
   date: "June 18, 2023",
@@ -24,7 +23,7 @@ const nextShow = {
 
 const FeaturedShow: React.FC = () => {
   return (
-    <section className="py-16 bg-gradient-to-b from-background via-background/95 to-background/90">
+    <section className="py-16 bg-[#000000e6]">
       <div className="container px-4">
         <motion.div 
           className="flex flex-col items-center text-center mb-10"
@@ -33,19 +32,23 @@ const FeaturedShow: React.FC = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <Badge variant="outline" className="mb-4 bg-primary/10 border-primary/20">Featured Show</Badge>
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-2 text-gradient">Don't Miss The Next Big Show</h2>
-          <p className="text-muted-foreground max-w-2xl">
+          <Badge variant="outline" className="mb-4 bg-[#9b87f5]/10 border-[#9b87f5]/20 text-[#9b87f5]">
+            Featured Show
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-white/90 to-white/80">
+            Don't Miss The Next Big Show
+          </h2>
+          <p className="text-gray-400 max-w-2xl">
             Grab your tickets now for Alex Miller's next performance
           </p>
         </motion.div>
 
         <motion.div
-          className="overflow-hidden glass-morphism border-primary/20 shadow-xl rounded-2xl"
+          className="overflow-hidden border border-white/10 shadow-xl rounded-2xl bg-black/40 backdrop-blur-xl"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.8 }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative overflow-hidden">
@@ -56,7 +59,7 @@ const FeaturedShow: React.FC = () => {
                 transition={{ duration: 1.2 }}
                 className="absolute inset-0"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent z-10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#9b87f5]/20 to-transparent z-10" />
                 <img 
                   src={nextShow.imageUrl} 
                   alt={`${nextShow.city} Show`} 
@@ -64,7 +67,7 @@ const FeaturedShow: React.FC = () => {
                 />
               </motion.div>
               <Badge 
-                className="absolute top-4 left-4 z-20 bg-primary text-primary-foreground"
+                className="absolute top-4 left-4 z-20 bg-[#9b87f5] text-white"
               >
                 {nextShow.status}
               </Badge>
@@ -73,7 +76,7 @@ const FeaturedShow: React.FC = () => {
             <div className="p-6 flex flex-col justify-between">
               <div>
                 <motion.h3 
-                  className="text-2xl font-bold font-display mb-2"
+                  className="text-2xl font-bold font-display mb-2 text-white"
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -82,30 +85,30 @@ const FeaturedShow: React.FC = () => {
                   {nextShow.city}
                 </motion.h3>
                 <motion.div 
-                  className="flex items-center text-sm text-muted-foreground mb-2"
+                  className="flex items-center text-sm text-gray-400 mb-2"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                  <Calendar size={16} className="mr-1 text-primary/80" />
+                  <Calendar size={16} className="mr-1 text-[#9b87f5]" />
                   <span>{nextShow.date} • {nextShow.time}</span>
                 </motion.div>
                 <motion.div 
-                  className="flex items-center text-sm text-muted-foreground mb-4"
+                  className="flex items-center text-sm text-gray-400 mb-4"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <MapPin size={16} className="mr-1 text-primary/80" />
+                  <MapPin size={16} className="mr-1 text-[#9b87f5]" />
                   <span>{nextShow.venue}</span>
                 </motion.div>
                 
                 <Separator className="my-4 bg-white/10" />
                 
                 <motion.p 
-                  className="text-muted-foreground mb-6"
+                  className="text-gray-300 mb-6"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
@@ -118,7 +121,7 @@ const FeaturedShow: React.FC = () => {
               <div className="space-y-4">
                 <Link to={`/shows/${nextShow.id}`} className="w-full">
                   <Button 
-                    className="w-full group bg-primary hover:bg-primary/90"
+                    className="w-full group bg-[#9b87f5] hover:bg-[#9b87f5]/90 text-white"
                   >
                     <span>Show Details</span>
                     <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
@@ -128,7 +131,7 @@ const FeaturedShow: React.FC = () => {
                 <Link to={`/shows/${nextShow.id}/seating`} className="w-full">
                   <Button 
                     variant="outline"
-                    className="w-full border-primary/20 hover:bg-secondary"
+                    className="w-full border-white/20 hover:bg-white/10 text-white"
                   >
                     <Ticket size={16} className="mr-2" />
                     <span>Get Tickets</span>
