@@ -6,9 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import SeatSelection from "./components/SeatSelection";
+import SeatSelection from "./pages/SeatSelection";
 import TicketCheckout from "./pages/TicketCheckout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import ShowDetails from "./pages/ShowDetails";
 
 const queryClient = new QueryClient();
 
