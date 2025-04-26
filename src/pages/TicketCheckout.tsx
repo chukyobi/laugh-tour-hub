@@ -1,6 +1,6 @@
 
 import React from "react";
-import { TicketCheckout as TicketCheckoutComponent } from "@/components/TicketCheckout";
+import TicketCheckoutComponent from "@/components/TicketCheckout";
 
 interface TicketCheckoutProps {
   showId: string;

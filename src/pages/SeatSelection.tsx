@@ -1,6 +1,6 @@
 
 import React from "react";
-import { SeatSelection as SeatSelectionComponent } from "@/components/SeatSelection";
+import SeatSelectionComponent from "@/components/SeatSelection";
 
 interface SeatSelectionProps {
   showId: string;
