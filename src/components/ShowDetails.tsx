@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom"; // Changed from next/link
-import { Calendar, MapPin, Clock, ArrowLeft, Ticket, Youtube, ExternalLink, Star, Users } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowLeft, Ticket, Youtube, ExternalLink, Star, Users, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
