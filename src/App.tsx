@@ -13,8 +13,9 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 
 const queryClient = new QueryClient();
 
+// Properly define the params interface to fix TypeScript errors
 interface ShowParams {
-  id?: string;
+  [key: string]: string | undefined;
 }
 
 // Wrapper components to extract and pass ID params
