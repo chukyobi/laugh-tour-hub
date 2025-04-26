@@ -1,10 +1,10 @@
 
-import { ArrowRight, Calendar, MapPin, Ticket, Youtube } from "lucide-react";
+import React from "react";
+import { ArrowRight, Calendar, MapPin, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 // Get the next upcoming show (first one that's not sold out)
@@ -22,27 +22,47 @@ const nextShow = {
   description: "Don't miss the Boston leg of Alex's 'Everyday Extraordinary' tour. Following his sold-out show last year, Alex returns to the Wilbur with fresh material and his trademark observational wit. This performance features a special Q&A segment at the end, where Alex will take questions from the audience."
 };
 
-const FeaturedShow = () => {
+const FeaturedShow: React.FC = () => {
   return (
-    <section className="py-16 bg-gradient-to-b from-secondary to-background">
+    <section className="py-16 bg-gradient-to-b from-background via-background/95 to-background/90">
       <div className="container px-4">
-        <div className="flex flex-col items-center text-center mb-10">
-          <Badge variant="outline" className="mb-4">Featured Show</Badge>
-          <h2 className="text-3xl md:text-4xl font-display font-bold mb-2">Don't Miss The Next Big Show</h2>
+        <motion.div 
+          className="flex flex-col items-center text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <Badge variant="outline" className="mb-4 bg-primary/10 border-primary/20">Featured Show</Badge>
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-2 text-gradient">Don't Miss The Next Big Show</h2>
           <p className="text-muted-foreground max-w-2xl">
             Grab your tickets now for Alex Miller's next performance
           </p>
-        </div>
+        </motion.div>
 
-        <Card className="overflow-hidden bg-card/50 backdrop-blur-sm border-primary/10 shadow-xl">
+        <motion.div
+          className="overflow-hidden glass-morphism border-primary/20 shadow-xl rounded-2xl"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent z-10" />
-              <img 
-                src={nextShow.imageUrl} 
-                alt={`${nextShow.city} Show`} 
-                className="h-full w-full object-cover transition-all hover:scale-105 duration-700"
-              />
+              <motion.div 
+                initial={{ scale: 1.1 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.2 }}
+                className="absolute inset-0"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent z-10" />
+                <img 
+                  src={nextShow.imageUrl} 
+                  alt={`${nextShow.city} Show`} 
+                  className="h-full w-full object-cover"
+                />
+              </motion.div>
               <Badge 
                 className="absolute top-4 left-4 z-20 bg-primary text-primary-foreground"
               >
@@ -50,23 +70,49 @@ const FeaturedShow = () => {
               </Badge>
             </div>
             
-            <CardContent className="p-6 flex flex-col justify-between">
+            <div className="p-6 flex flex-col justify-between">
               <div>
-                <h3 className="text-2xl font-bold font-display mb-2">{nextShow.city}</h3>
-                <div className="flex items-center text-sm text-muted-foreground mb-2">
-                  <Calendar size={16} className="mr-1" />
+                <motion.h3 
+                  className="text-2xl font-bold font-display mb-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {nextShow.city}
+                </motion.h3>
+                <motion.div 
+                  className="flex items-center text-sm text-muted-foreground mb-2"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  <Calendar size={16} className="mr-1 text-primary/80" />
                   <span>{nextShow.date} • {nextShow.time}</span>
-                </div>
-                <div className="flex items-center text-sm text-muted-foreground mb-4">
-                  <MapPin size={16} className="mr-1" />
+                </motion.div>
+                <motion.div 
+                  className="flex items-center text-sm text-muted-foreground mb-4"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <MapPin size={16} className="mr-1 text-primary/80" />
                   <span>{nextShow.venue}</span>
-                </div>
+                </motion.div>
                 
-                <Separator className="my-4" />
+                <Separator className="my-4 bg-white/10" />
                 
-                <p className="text-muted-foreground mb-6 line-clamp-3">
+                <motion.p 
+                  className="text-muted-foreground mb-6"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                >
                   {nextShow.description}
-                </p>
+                </motion.p>
               </div>
               
               <div className="space-y-4">
@@ -89,9 +135,9 @@ const FeaturedShow = () => {
                   </Button>
                 </Link>
               </div>
-            </CardContent>
+            </div>
           </div>
-        </Card>
+        </motion.div>
       </div>
     </section>
   );

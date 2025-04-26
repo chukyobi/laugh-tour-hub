@@ -53,7 +53,6 @@ const App = () => (
           <Route path="/shows/:id/seating" element={<SeatSelectionWrapper />} />
           <Route path="/shows/:id/checkout" element={<TicketCheckoutWrapper />} />
           <Route path="/shows/:id/confirmation" element={<OrderConfirmationWrapper />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
